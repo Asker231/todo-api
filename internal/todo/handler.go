@@ -38,7 +38,7 @@ func(todoHandler *TodoHandler)Create()http.HandlerFunc{
 		}
 		todo := &Todo{
 			Text: body.Text,
-			Complited: body.Complited,
+			Complited: false,
 		}
 		err = todoHandler.repo.Create(todo)
 		if err != nil{
