@@ -12,6 +12,6 @@ type(
 	TodoResponse struct{
 		Text string `json:"text"`
 		Complited bool `json:"complited"`
-		Date time.Time `json:"date"`
+		CreatedAt time.Time `json:"date"`
 	}
 )

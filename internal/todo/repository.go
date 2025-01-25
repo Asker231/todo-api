@@ -1,6 +1,8 @@
 package todo
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 type RepositoryTodo struct{
@@ -20,4 +22,24 @@ func(repo *RepositoryTodo)Create(todo *Todo)(error){
 		return nil
 	}
 	return nil
+}
+
+func(repo *RepositoryTodo)UpdateTodo(id int)(*Todo,error){
+	var todo Todo
+	result := repo.Database.First(&todo,"id = ?",id)
+	if result.Error != nil{
+		fmt.Println(result.Error.Error())
+		return nil,result.Error
+	}	
+	result.Model(&todo).Update("complited",true)
+	return &todo,nil
+}
+
+func(repo *RepositoryTodo)GetAll()(*[]Todo,error){
+	var todos []Todo
+	result := repo.Database.Find(&todos)
+	if result.Error != nil{
+		return nil,result.Error
+	}
+	return &todos,nil
 }

@@ -3,8 +3,10 @@ package todo
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Asker231/todo-api.git/pkg/req"
+	"github.com/Asker231/todo-api.git/pkg/res"
 )
 
 type(
@@ -27,7 +29,11 @@ func NewTodoHandler(router *http.ServeMux,repo RepositoryTodo){
 
 func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("All todos"))
+		todos,err := todoHandler.repo.GetAll()	
+		if err != nil{
+			fmt.Println(err.Error())
+		}
+		res.Response(w,todos,200)
 	}
 }
 func(todoHandler *TodoHandler)Create()http.HandlerFunc{
@@ -50,16 +56,25 @@ func(todoHandler *TodoHandler)Create()http.HandlerFunc{
 }
 func(todoHandler *TodoHandler)Delete()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		_ = r.PathValue("id")
 	}
 }
 func(todoHandler *TodoHandler)Update()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id , _:= strconv.Atoi(idStr)
+		result,err := todoHandler.repo.UpdateTodo(id)
+		if err != nil{
+			fmt.Println(err.Error())
+		}
+		res.Response(w,result,200)
+
 
 	}
 }
 func(todoHandler *TodoHandler)GetById()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
+		_ = r.PathValue("id")
 
 	}
 }
