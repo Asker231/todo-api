@@ -1,19 +1,28 @@
 package todo
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
 
-type(
-	TodoHandler struct{}
+	"github.com/Asker231/todo-api.git/pkg/req"
 )
 
-func NewTodoHandler(router *http.ServeMux){
-		todohandler := &TodoHandler{}
+type(
+	TodoHandler struct{
+		repo RepositoryTodo
+	}
+)
+
+func NewTodoHandler(router *http.ServeMux,repo RepositoryTodo){
+		todohandler := &TodoHandler{
+			repo:  repo,
+		}
 		//paths
 		router.HandleFunc("GET   /all",todohandler.GetAll())
-		router.HandleFunc("GET   /todos/{id}",todohandler.GetById())
-		router.HandleFunc("POST  /todos/delete/{id}",todohandler.Delete())
-		router.HandleFunc("POST  /todos/create",todohandler.Create())
-		router.HandleFunc("PATCH /todos/update/{id}",todohandler.Update())
+		router.HandleFunc("GET   /todo/{id}",todohandler.GetById())
+		router.HandleFunc("POST  /todo/delete/{id}",todohandler.Delete())
+		router.HandleFunc("POST  /todo/create",todohandler.Create())
+		router.HandleFunc("PATCH /todo/update/{id}",todohandler.Update())
 }
 
 func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
@@ -23,6 +32,19 @@ func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
 }
 func(todoHandler *TodoHandler)Create()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
+		body,err := req.HandleBody[TodoRequest](w,r)
+		if err != nil{
+			fmt.Println(err.Error())
+		}
+		todo := &Todo{
+			Text: body.Text,
+			Complited: body.Complited,
+		}
+		err = todoHandler.repo.Create(todo)
+		if err != nil{
+			fmt.Println(err.Error())
+			return
+		}
 
 	}
 }
@@ -38,6 +60,6 @@ func(todoHandler *TodoHandler)Update()http.HandlerFunc{
 }
 func(todoHandler *TodoHandler)GetById()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+
 	}
 }

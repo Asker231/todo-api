@@ -15,13 +15,16 @@ func main(){
 	config := config.NewAppConfig()
 
 	//database
-	_ = db.ConnectDataBase(config)
+	 db := db.ConnectDataBase(config)
 
 	//create router
 	router := http.NewServeMux()
 
+	//repository
+	repoTodo := todo.NewTodoRepository(*db)
+
 	//handlers
-	todo.NewTodoHandler(router)
+	todo.NewTodoHandler(router,*repoTodo)
 
 	//create server
 	server := http.Server{
