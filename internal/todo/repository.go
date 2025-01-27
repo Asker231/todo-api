@@ -53,3 +53,13 @@ func(repo *RepositoryTodo)GetAll()(*[]Todo,error){
 	}
 	return &todos,nil
 }
+
+func(repo *RepositoryTodo)GetTodoById(id int)(*Todo,error){
+	var todo Todo
+	result := repo.Database.First(&todo,"id = ?",id)
+	if result.Error != nil{
+		fmt.Println(result.Error.Error())
+		return nil,result.Error
+	}
+	return &todo,nil	
+}
