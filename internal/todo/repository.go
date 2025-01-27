@@ -24,6 +24,16 @@ func(repo *RepositoryTodo)Create(todo *Todo)(error){
 	return nil
 }
 
+func(repo *RepositoryTodo)DeleteTodo(id int)(error){
+	var todo Todo
+	result := repo.Database.Delete(&todo,"id = ?",id)
+	if result.Error != nil{
+		fmt.Println(result.Error.Error())
+		return nil
+	}
+	return nil
+}
+
 func(repo *RepositoryTodo)UpdateTodo(id int)(*Todo,error){
 	var todo Todo
 	result := repo.Database.First(&todo,"id = ?",id)

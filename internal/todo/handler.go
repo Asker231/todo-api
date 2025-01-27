@@ -22,7 +22,7 @@ func NewTodoHandler(router *http.ServeMux,repo RepositoryTodo){
 		//paths
 		router.HandleFunc("GET   /all",todohandler.GetAll())
 		router.HandleFunc("GET   /todo/{id}",todohandler.GetById())
-		router.HandleFunc("POST  /todo/delete/{id}",todohandler.Delete())
+		router.HandleFunc("DELETE  /todo/delete/{id}",todohandler.Delete())
 		router.HandleFunc("POST  /todo/create",todohandler.Create())
 		router.HandleFunc("PATCH /todo/update/{id}",todohandler.Update())
 }
@@ -56,13 +56,26 @@ func(todoHandler *TodoHandler)Create()http.HandlerFunc{
 }
 func(todoHandler *TodoHandler)Delete()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		_ = r.PathValue("id")
+		idStr := r.PathValue("id")
+		id , _:= strconv.Atoi(idStr)
+
+		err := todoHandler.repo.DeleteTodo(id)
+		if err != nil{
+			fmt.Println(err.Error())
+		}
+		todos ,err := todoHandler.repo.GetAll()
+		if err != nil{
+			fmt.Println(err)
+		}
+		res.Response(w,todos,200)
+
 	}
 }
 func(todoHandler *TodoHandler)Update()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 		id , _:= strconv.Atoi(idStr)
+
 		result,err := todoHandler.repo.UpdateTodo(id)
 		if err != nil{
 			fmt.Println(err.Error())
