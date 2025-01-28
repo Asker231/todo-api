@@ -7,6 +7,7 @@ import (
 
 	"github.com/Asker231/todo-api.git/pkg/req"
 	"github.com/Asker231/todo-api.git/pkg/res"
+	"gorm.io/gorm"
 )
 
 type(
@@ -73,16 +74,24 @@ func(todoHandler *TodoHandler)Delete()http.HandlerFunc{
 }
 func(todoHandler *TodoHandler)Update()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
+		body,err := req.HandleBody[TodoRequest](w,r)
+		if err != nil{
+			fmt.Println(err.Error())
+		}
 		idStr := r.PathValue("id")
 		id , _:= strconv.Atoi(idStr)
 
-		result,err := todoHandler.repo.UpdateTodo(id)
+		result,err := todoHandler.repo.UpdateTodo(&Todo{
+			Model: &gorm.Model{
+				ID: uint(id),
+			},
+			Text: body.Text,
+			Complited: body.Complited,
+		})
 		if err != nil{
 			fmt.Println(err.Error())
 		}
 		res.Response(w,result,200)
-
-
 	}
 }
 func(todoHandler *TodoHandler)GetById()http.HandlerFunc{

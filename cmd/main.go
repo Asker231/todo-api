@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
+
 	"github.com/Asker231/todo-api.git/config"
+	"github.com/Asker231/todo-api.git/internal/auth"
 	"github.com/Asker231/todo-api.git/internal/todo"
 	"github.com/Asker231/todo-api.git/pkg/db"
 )
@@ -25,6 +27,7 @@ func main(){
 
 	//handlers
 	todo.NewTodoHandler(router,*repoTodo)
+	auth.NewAuthUser(router,&config.AuthConfig)
 
 	//create server
 	server := http.Server{

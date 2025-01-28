@@ -34,15 +34,13 @@ func(repo *RepositoryTodo)DeleteTodo(id int)(error){
 	return nil
 }
 
-func(repo *RepositoryTodo)UpdateTodo(id int)(*Todo,error){
-	var todo Todo
-	result := repo.Database.First(&todo,"id = ?",id)
+func(repo *RepositoryTodo)UpdateTodo(todo *Todo)(*Todo,error){
+	result := repo.Database.Model(todo).Update("complited",true)
 	if result.Error != nil{
-		fmt.Println(result.Error.Error())
 		return nil,result.Error
-	}	
-	result.Model(&todo).Update("complited",true)
-	return &todo,nil
+	}
+	return todo,nil
+
 }
 
 func(repo *RepositoryTodo)GetAll()(*[]Todo,error){
