@@ -24,10 +24,14 @@ func main(){
 
 	//repository
 	repoTodo := todo.NewTodoRepository(*db)
+	//services
+		
+	todoService := todo.NewServiceTodo(repoTodo)
 
 	//handlers
-	todo.NewTodoHandler(router,*repoTodo)
+	todo.NewTodoHandler(router, todoService)
 	auth.NewAuthUser(router,&config.AuthConfig)
+
 
 	//create server
 	server := http.Server{

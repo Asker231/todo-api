@@ -12,13 +12,13 @@ import (
 
 type(
 	TodoHandler struct{
-		repo RepositoryTodo
+		service *TodoService
 	}
 )
 
-func NewTodoHandler(router *http.ServeMux,repo RepositoryTodo){
+func NewTodoHandler(router *http.ServeMux,service *TodoService){
 		todohandler := &TodoHandler{
-			repo:  repo,
+			service: service,
 		}
 		//paths
 		router.HandleFunc("GET   /all",todohandler.GetAll())
@@ -30,9 +30,10 @@ func NewTodoHandler(router *http.ServeMux,repo RepositoryTodo){
 
 func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		todos,err := todoHandler.repo.GetAll()	
+		todos,err := todoHandler.service.ServiceGetAllTodos()
 		if err != nil{
-			fmt.Println(err.Error())
+			 res.Response(w,err.Error(),404) 
+			return
 		}
 		res.Response(w,todos,200)
 	}
@@ -43,15 +44,15 @@ func(todoHandler *TodoHandler)Create()http.HandlerFunc{
 		if err != nil{
 			fmt.Println(err.Error())
 		}
-		todo := &Todo{
+		result,err :=todoHandler.service.ServiceCreateTodo(&Todo{
 			Text: body.Text,
-			Complited: false,
-		}
-		err = todoHandler.repo.Create(todo)
+			Complited: body.Complited,	
+		})
 		if err != nil{
-			fmt.Println(err.Error())
+			res.Response(w,err.Error(),404) 
 			return
 		}
+		res.Response(w,result,200)
 
 	}
 }
@@ -60,16 +61,12 @@ func(todoHandler *TodoHandler)Delete()http.HandlerFunc{
 		idStr := r.PathValue("id")
 		id , _:= strconv.Atoi(idStr)
 
-		err := todoHandler.repo.DeleteTodo(id)
+		err := todoHandler.service.ServiceDeleteTodo(id)
 		if err != nil{
-			fmt.Println(err.Error())
+			res.Response(w,err.Error(),404)
+			return
 		}
-		todos ,err := todoHandler.repo.GetAll()
-		if err != nil{
-			fmt.Println(err)
-		}
-		res.Response(w,todos,200)
-
+		res.Response(w,"Success",200)
 	}
 }
 func(todoHandler *TodoHandler)Update()http.HandlerFunc{
@@ -81,17 +78,21 @@ func(todoHandler *TodoHandler)Update()http.HandlerFunc{
 		idStr := r.PathValue("id")
 		id , _:= strconv.Atoi(idStr)
 
-		result,err := todoHandler.repo.UpdateTodo(&Todo{
+		err = todoHandler.service.ServiceUpdateTodo(Todo{
 			Model: &gorm.Model{
 				ID: uint(id),
 			},
 			Text: body.Text,
 			Complited: body.Complited,
 		})
+
 		if err != nil{
-			fmt.Println(err.Error())
+			res.Response(w,err.Error(),404)
+			return
 		}
-		res.Response(w,result,200)
+		res.Response(w,"Success",200)
+
+		
 	}
 }
 func(todoHandler *TodoHandler)GetById()http.HandlerFunc{
