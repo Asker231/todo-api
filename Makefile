@@ -1,6 +1,6 @@
 dev:
 	go run cmd/main.go
-migration:
+migrate:
 	go run migration/main.go
 dbstart:
 	docker compose up -d
