@@ -30,15 +30,30 @@ func(a *AuthUser)Register()http.HandlerFunc{
 		   res.Response(w,err.Error(),401)	
 		   return	
 		}
-		_ , err = a.servise.Register(payload.Email,payload.Password,payload.Name)
+		us ,err := a.servise.Register(payload.Email,payload.Password,payload.Name)
 		if err != nil{
+			res.Response(w,err.Error(),204)
 			return
 		}
 
-		res.Response(w,a.config.SECRET,200)
+		res.Response(w,us,200)
 
 	}
 }
 func(a *AuthUser)Login()http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request) {}
+	return func(w http.ResponseWriter, r *http.Request) {
+		payload,err := req.HandleBody[LoginRequest](w,r)
+		if err != nil{
+			res.Response(w,err.Error(),401)	
+			return	
+		 }
+		 _,err = a.servise.Login(payload.Email,payload.Password)
+
+		 if err != nil{
+			res.Response(w,err.Error(),204)
+			return
+		 }
+		 res.Response(w,"Create",201)
+
+	}
 }
