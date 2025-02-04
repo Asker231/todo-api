@@ -7,6 +7,7 @@ import (
 	"github.com/Asker231/todo-api.git/config"
 	"github.com/Asker231/todo-api.git/internal/auth"
 	"github.com/Asker231/todo-api.git/internal/todo"
+	"github.com/Asker231/todo-api.git/internal/user"
 	"github.com/Asker231/todo-api.git/pkg/db"
 )
 
@@ -24,13 +25,15 @@ func main(){
 
 	//repository
 	repoTodo := todo.NewTodoRepository(*db)
+	repoUser := user.NewUserRepo(db)
+
 	//services
-		
+	authService := auth.NewServiceAuth(repoUser)	
 	todoService := todo.NewServiceTodo(repoTodo)
 
 	//handlers
 	todo.NewTodoHandler(router, todoService)
-	auth.NewAuthUser(router,&config.AuthConfig)
+	auth.NewAuthUser(router,&config.AuthConfig,*authService)
 
 
 	//create server

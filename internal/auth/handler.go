@@ -10,11 +10,13 @@ import (
 
 type AuthUser struct{
 	config *config.AuthConfig
+	servise *ServiceAuth
 }
 
-func NewAuthUser(router *http.ServeMux,config *config.AuthConfig){
+func NewAuthUser(router *http.ServeMux,config *config.AuthConfig,serviceAuth ServiceAuth){
 	handleAuth := AuthUser{
 		config: config,
+		servise: &serviceAuth,
 	}
 	router.Handle("POST /auth/register",handleAuth.Register())
 	router.Handle("POST /auth/login",handleAuth.Login())
@@ -23,11 +25,16 @@ func NewAuthUser(router *http.ServeMux,config *config.AuthConfig){
 
 func(a *AuthUser)Register()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		_ , err := req.HandleBody[RegisterRequest](w,r)
+		payload , err := req.HandleBody[RegisterRequest](w,r)
 		if err != nil{
 		   res.Response(w,err.Error(),401)	
 		   return	
 		}
+		_ , err = a.servise.Register(payload.Email,payload.Password,payload.Name)
+		if err != nil{
+			return
+		}
+
 		res.Response(w,a.config.SECRET,200)
 
 	}
