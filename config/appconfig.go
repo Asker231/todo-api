@@ -20,7 +20,7 @@ type(
 )
 
 func NewAppConfig()*AppConfig{
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil{
 		fmt.Println(err.Error())
 	}

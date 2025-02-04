@@ -30,6 +30,10 @@ func NewTodoHandler(router *http.ServeMux,service *TodoService){
 
 func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
+		//redis
+	
+
+		//
 		todos,err := todoHandler.service.ServiceGetAllTodos()
 		if err != nil{
 			 res.Response(w,err.Error(),404) 
