@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Asker231/todo-api.git/middleware"
 	"github.com/Asker231/todo-api.git/pkg/req"
 	"github.com/Asker231/todo-api.git/pkg/res"
 	"gorm.io/gorm"
@@ -24,7 +25,7 @@ func NewTodoHandler(router *http.ServeMux,service *TodoService){
 		router.HandleFunc("GET   /all",todohandler.GetAll())
 		router.HandleFunc("GET   /todo/{id}",todohandler.GetById())
 		router.HandleFunc("DELETE  /todo/delete/{id}",todohandler.Delete())
-		router.HandleFunc("POST  /todo/create",todohandler.Create())
+		router.Handle("POST  /todo/create", middleware.IsLogined( todohandler.Create()))
 		router.HandleFunc("PATCH /todo/update/{id}",todohandler.Update())
 }
 
@@ -39,6 +40,7 @@ func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
 			 res.Response(w,err.Error(),404) 
 			return
 		}
+		
 		res.Response(w,todos,200)
 	}
 }

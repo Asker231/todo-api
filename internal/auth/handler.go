@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Asker231/todo-api.git/config"
+	"github.com/Asker231/todo-api.git/pkg/jwt"
 	"github.com/Asker231/todo-api.git/pkg/req"
 	"github.com/Asker231/todo-api.git/pkg/res"
 )
@@ -30,13 +31,20 @@ func(a *AuthUser)Register()http.HandlerFunc{
 		   res.Response(w,err.Error(),401)	
 		   return	
 		}
-		us ,err := a.servise.Register(payload.Email,payload.Password,payload.Name)
+		_ ,err = a.servise.Register(payload.Email,payload.Password,payload.Name)
 		if err != nil{
 			res.Response(w,err.Error(),204)
 			return
 		}
+		token ,err := jwt.NewGenerateJWT(a.config.SECRET).GenJWT(payload.Email)
+		if err != nil{
+		   res.Response(w,err.Error(),404)
+		   return
+		}
 
-		res.Response(w,us,200)
+		res.Response(w,RegisterResponse{
+			Token: token,
+		},201)
 
 	}
 }
@@ -53,7 +61,6 @@ func(a *AuthUser)Login()http.HandlerFunc{
 			res.Response(w,err.Error(),204)
 			return
 		 }
-		 res.Response(w,"Create",201)
 
 	}
 }
