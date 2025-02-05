@@ -9,6 +9,7 @@ import (
 	"github.com/Asker231/todo-api.git/internal/todo"
 	"github.com/Asker231/todo-api.git/internal/user"
 	"github.com/Asker231/todo-api.git/pkg/db"
+	"github.com/Asker231/todo-api.git/pkg/middleware"
 )
 
 
@@ -39,7 +40,7 @@ func main(){
 	//create server
 	server := http.Server{
 		Addr: ":8080",
-		Handler: router,
+		Handler: middleware.CORS(router),
 	}
 	
 	//server started

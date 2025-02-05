@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Asker231/todo-api.git/middleware"
+	"github.com/Asker231/todo-api.git/pkg/middleware"
 	"github.com/Asker231/todo-api.git/pkg/req"
 	"github.com/Asker231/todo-api.git/pkg/res"
 	"gorm.io/gorm"
@@ -31,10 +31,6 @@ func NewTodoHandler(router *http.ServeMux,service *TodoService){
 
 func(todoHandler *TodoHandler)GetAll()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
-		//redis
-	
-
-		//
 		todos,err := todoHandler.service.ServiceGetAllTodos()
 		if err != nil{
 			 res.Response(w,err.Error(),404) 
