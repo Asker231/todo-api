@@ -33,8 +33,8 @@ func main(){
 	todoService := todo.NewServiceTodo(repoTodo)
 
 	//handlers
-	todo.NewTodoHandler(router, todoService)
-	auth.NewAuthUser(router,&config.AuthConfig,*authService)
+	todo.NewTodoHandler(router, todoService,config)
+	auth.NewAuthUser(router,config,*authService)
 
 
 	//create server

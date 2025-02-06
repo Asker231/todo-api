@@ -5,25 +5,32 @@ import (
 
 	"github.com/Asker231/todo-api.git/config"
 	"github.com/Asker231/todo-api.git/pkg/jwt"
+	"github.com/Asker231/todo-api.git/pkg/middleware"
 	"github.com/Asker231/todo-api.git/pkg/req"
 	"github.com/Asker231/todo-api.git/pkg/res"
 )
 
 type AuthUser struct{
-	config *config.AuthConfig
+	config *config.AppConfig
 	servise *ServiceAuth
 }
 
-func NewAuthUser(router *http.ServeMux,config *config.AuthConfig,serviceAuth ServiceAuth){
+func NewAuthUser(router *http.ServeMux,config *config.AppConfig,serviceAuth ServiceAuth){
 	handleAuth := AuthUser{
 		config: config,
 		servise: &serviceAuth,
 	}
-	router.Handle("POST /auth/register",handleAuth.Register())
-	router.Handle("POST /auth/login",handleAuth.Login())
+	router.HandleFunc("POST /auth/register",handleAuth.Register())
+	router.HandleFunc("POST /auth/login",handleAuth.Login())
+
+	router.Handle("/home",middleware.IsLogined(handleAuth.HomePage(),config))
 
 }
-
+func(a *AuthUser)HomePage()http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello from home page"))
+	}
+}
 func(a *AuthUser)Register()http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		payload , err := req.HandleBody[RegisterRequest](w,r)
@@ -36,15 +43,15 @@ func(a *AuthUser)Register()http.HandlerFunc{
 			res.Response(w,err.Error(),204)
 			return
 		}
-		token ,err := jwt.NewGenerateJWT(a.config.SECRET).GenJWT(payload.Email)
+		t ,err := jwt.NewGenerateJWT(a.config.AuthConfig.SECRET).GenJWT(payload.Email)
+
 		if err != nil{
 		   res.Response(w,err.Error(),404)
 		   return
 		}
+		res.Response(w,t,201)
+		http.Redirect(w,r,"/home",301)
 
-		res.Response(w,RegisterResponse{
-			Token: token,
-		},201)
 
 	}
 }
@@ -61,6 +68,6 @@ func(a *AuthUser)Login()http.HandlerFunc{
 			res.Response(w,err.Error(),204)
 			return
 		 }
-
+		 http.Redirect(w,r,"/home",301)
 	}
 }

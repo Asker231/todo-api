@@ -51,7 +51,7 @@ func(authService *ServiceAuth)Login(email,password string)(*user.User,error){
 	if u == nil{
 		return nil,errors.New("Нет такого пользователя")
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(password),[]byte(u.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password),[]byte(password))
 	if err != nil{
 		return nil,err
 	}
